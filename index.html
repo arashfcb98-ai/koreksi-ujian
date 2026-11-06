@@ -155,6 +155,51 @@ table.rank .c{width:28px;color:var(--muted)}
 #toastBox{position:fixed;left:0;right:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:30}
 .toast{background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:13.5px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:.01ms!important}}
+
+/* Ujian aktif */
+.activebar{display:flex;align-items:center;gap:12px;background:var(--accent-soft);border-radius:14px;padding:10px 14px;text-decoration:none;color:var(--ink);margin-bottom:14px}
+.activebar .dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--green) 22%,transparent)}
+.activebar .tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.activebar small{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.activebar b{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.activebar .meta{font-size:12px;color:var(--muted);text-align:right;flex:none}
+.badge{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--blank-bg);color:var(--muted)}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.f select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+.stack{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+/* Modal panduan */
+.modal{position:fixed;inset:0;z-index:70;background:rgba(8,20,26,.55);display:flex;align-items:flex-end;justify-content:center}
+.sheetbox{background:var(--surface);color:var(--ink);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheetbox h2{font-size:18px}
+.gd{display:grid;grid-template-columns:128px 1fr;gap:16px;margin:14px 0;align-items:start}
+@media(max-width:420px){.gd{grid-template-columns:104px 1fr}}
+.gd svg,.gd3 svg{width:100%;height:auto;display:block}
+.gsteps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:9px;font-size:14px}
+.gsteps li::marker{font-weight:800;color:var(--accent)}
+.gd3{background:var(--bg);border-radius:14px;padding:12px;margin:6px 0 14px}
+.gd3 p{margin:8px 0 0}
+.dd{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+@media(max-width:420px){.dd{grid-template-columns:1fr}}
+.dd div{border-radius:12px;padding:10px 12px;font-size:13px}
+.dd .do{background:var(--ok-bg);color:var(--ok)}.dd .dont{background:var(--bad-bg);color:var(--bad)}
+.dd b{display:block;margin-bottom:4px}.dd ul{margin:0;padding-left:16px}
+/* Kamera dalam aplikasi */
+#camBox{position:fixed;inset:0;z-index:60;background:#000;color:#fff;display:flex;flex-direction:column}
+#camBox[hidden]{display:none}
+.cam-top,.cam-bot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top,0px))}
+.cam-bot{padding-top:12px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));flex-direction:column}
+#camStage{flex:1;position:relative;min-height:0;background:#000}
+#camVideo{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+#camSvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.cam-hint{font-size:13px;text-align:center;line-height:1.45;max-width:460px;color:#E9F4F8}
+.cam-msg{position:absolute;left:16px;right:16px;top:40%;text-align:center;font-size:14px}
+.shutter{width:72px;height:72px;border-radius:50%;border:4px solid #fff;background:transparent;padding:0;cursor:pointer;display:grid;place-items:center}
+.shutter i{width:56px;height:56px;border-radius:50%;background:#fff;display:block}
+.shutter:active i{transform:scale(.92)}
+.cam-seg{display:flex;gap:6px}
+.cam-seg button,.cam-x{font:700 13px var(--font);color:#fff;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:8px 14px;cursor:pointer}
+.cam-seg button[aria-pressed=true]{background:#fff;color:#0B171D}
+.cam-row{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:460px}
 </style>
 </head>
 <body>
@@ -168,20 +213,21 @@ table.rank .c{width:28px;color:var(--muted)}
     <button type="button" class="ico" id="thToggle" aria-label="Ganti tema terang atau gelap"><svg viewBox="0 0 24 24" id="thIcon"></svg></button>
   </header>
   <div class="brandline" aria-hidden="true"></div>
+  <div id="activeBar"></div>
 
   <main>
     <section id="v-pengaturan" class="view" hidden></section>
 
     <section id="v-pindai" class="view" hidden>
       <div class="eyebrow">Langkah 2 dari 3</div>
-      <div id="ctx"></div>
       <div id="keyWarn"></div>
       <div class="panel">
         <h2>Pindai lembar jawab</h2>
         <p class="muted" style="margin-bottom:14px">Foto satu kertas utuh (tiga lembar sekaligus) atau satu lembar saja. Keempat kotak hitam di sudut tiap lembar harus ikut terfoto. Foto boleh miring.</p>
         <div class="actions">
-          <label class="btn primary" for="inCam">Buka kamera</label>
+          <button class="btn primary" type="button" id="btnCam">Buka kamera</button>
           <label class="btn" for="inGal">Pilih dari galeri</label>
+          <button class="btn" type="button" id="btnGuide">Panduan foto</button>
         </div>
         <input id="inCam" class="sr" type="file" accept="image/*" capture="environment">
         <input id="inGal" class="sr" type="file" accept="image/*" multiple>
@@ -203,6 +249,15 @@ table.rank .c{width:28px;color:var(--muted)}
   <a href="#hasil" id="t-hasil"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Hasil<span class="count" id="cntHasil"></span></a>
   <a href="#riwayat" id="t-riwayat"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Riwayat</a>
 </div></nav>
+<div id="guideBox" class="modal" hidden></div>
+<div id="camBox" hidden aria-label="Kamera pemindai">
+  <div class="cam-top"><button type="button" class="cam-x" id="camClose">Tutup</button>
+    <div class="cam-seg" role="group" aria-label="Jumlah lembar dalam foto"><button type="button" data-m="3" aria-pressed="true">3 lembar</button><button type="button" data-m="1" aria-pressed="false">1 lembar</button></div>
+    <button type="button" class="cam-x" id="camHelp">Panduan</button></div>
+  <div id="camStage"><video id="camVideo" playsinline muted autoplay></video><svg id="camSvg" aria-hidden="true"></svg><div class="cam-msg" id="camMsg"></div></div>
+  <div class="cam-bot"><p class="cam-hint" id="camHint"></p>
+    <div class="cam-row"><label class="cam-x" for="inCam">Kamera bawaan HP</label><button type="button" class="shutter" id="camShot" aria-label="Ambil foto"><i></i></button><span style="width:116px"></span></div></div>
+</div>
 <div id="toastBox"></div>
 
 <script>
@@ -217,7 +272,8 @@ const DEMO_KEY="CBDABBBCEAEBAADDABAEDAEABEAEEDBBBBBCDBEAECEBAEEBCA";
 
 /* ====== Penyimpanan ====== */
 const LS='koreksi-sman3paloh-v2';
-const JENIS=['Ulangan Harian','PTS','PAS','Asesmen Sumatif','Try Out','Lainnya'];
+const JENIS=['Asesmen Sumatif Semester Ganjil','Asesmen Sumatif Semester Genap','Asesmen Sumatif Tengah Semester','Ulangan Harian','Kuis / Latihan'];
+const LAIN='Lainnya';
 let S; // {cfg:{jenis,mapel,kelas,tanggal,n,key[]}, results:[], history:[], histId}
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 const blankCfg=()=>({jenis:'Ulangan Harian',mapel:'',kelas:'',tanggal:today(),n:NMAX,key:Array(NMAX).fill('')});
@@ -231,7 +287,31 @@ function load(){
 }
 function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
 const exam=()=>S.cfg;
-const examTitle=c=>c.judul||[c.jenis,c.mapel,c.kelas&&('Kelas '+c.kelas)].filter(Boolean).join(' · ');
+const jenisLabel=c=>c.jenis===LAIN?(c.jenisLain||'Ujian'):c.jenis;
+const examTitle=c=>c.judul||[jenisLabel(c),c.mapel,c.kelas&&('Kelas '+c.kelas)].filter(Boolean).join(' · ');
+const JMAP={'PTS':'Asesmen Sumatif Tengah Semester','PAS':'Asesmen Sumatif Semester Ganjil','Asesmen Sumatif':'Asesmen Sumatif Semester Ganjil','Try Out':'Kuis / Latihan'};
+function fixS(){
+  S.presets=S.presets||[];S.presetId=S.presetId||null;S.jenisKustom=S.jenisKustom||[];
+  const nj=c=>{if(c&&JMAP[c.jenis])c.jenis=JMAP[c.jenis];return c;};
+  nj(S.cfg);S.history.forEach(h=>nj(h.cfg));S.presets.forEach(p=>nj(p.cfg));
+  if(S.presetId&&!S.presets.some(p=>p.id===S.presetId))S.presetId=null;
+}
+const presetCfg=c=>({jenis:c.jenis,jenisLain:c.jenisLain||'',mapel:c.mapel||'',kelas:c.kelas||'',n:c.n,key:c.key.slice()});
+const activePreset=()=>S.presets.find(p=>p.id===S.presetId);
+function isDirty(){const p=activePreset();return !p||JSON.stringify(presetCfg(S.cfg))!==JSON.stringify(p.cfg);}
+function uniqueName(name,selfId){let n=name||'Ujian',k=2,base=n;while(S.presets.some(p=>p.name===n&&p.id!==selfId))n=base+' ('+k++ +')';return n;}
+function savePreset(){
+  const c=S.cfg,p=activePreset();
+  if(p){p.cfg=presetCfg(c);p.name=uniqueName(examTitle(c),p.id);}
+  else{const n={id:'p'+Date.now(),name:uniqueName(examTitle(c)),cfg:presetCfg(c)};S.presets.push(n);S.presetId=n.id;}
+  save();
+}
+function activate(id){
+  const p=S.presets.find(x=>x.id===id);
+  if(S.results.length){archive();toast('Hasil ujian sebelumnya disimpan ke Riwayat.');}
+  S.cfg=p?Object.assign(blankCfg(),clone(p.cfg),{tanggal:today()}):blankCfg();
+  S.results=[];S.histId=null;S.presetId=p?p.id:null;pending=[];save();
+}
 let pending=[]; // hasil pindai yang belum disimpan
 
 /* ====== Util ====== */
@@ -501,12 +581,21 @@ function wireCard(card,r,ex,onChange){
 /* ====== Langkah 1: Pengaturan ====== */
 function renderPengaturan(){
   const c=S.cfg,v=$('#v-pengaturan');
+  const opts=JENIS.map(j=>`<option value="${esc(j)}" ${c.jenis===j?'selected':''}>${esc(j)}</option>`).join('')
+    +(S.jenisKustom.length?`<optgroup label="Jenis tersimpan">${S.jenisKustom.map(j=>`<option value="${esc(j)}" ${c.jenis===j?'selected':''}>${esc(j)}</option>`).join('')}</optgroup>`:'')
+    +`<option value="${LAIN}" ${c.jenis===LAIN?'selected':''}>Lainnya…</option>`;
   v.innerHTML=`
    <div class="eyebrow">Langkah 1 dari 3</div>
+   <div class="panel" id="actPanel"></div>
    <div class="panel">
     <h2>Jenis ujian</h2>
-    <p class="muted">Pilih jenis ujian lalu lengkapi keterangannya. Ini akan menjadi judul hasil di Riwayat.</p>
-    <div class="pick" id="jenis" role="group" aria-label="Jenis ujian">${JENIS.map(j=>`<button type="button" data-j="${j}" aria-pressed="${c.jenis===j}">${j}</button>`).join('')}</div>
+    <div class="stack">
+      <label class="f">Jenis<select id="fJenis">${opts}</select></label>
+      ${c.jenis===LAIN?`<div class="f">Nama jenis ujian
+        <input type="text" id="fLain" value="${esc(c.jenisLain||'')}" placeholder="mis. Remedial, Ujian Praktik" autocomplete="off">
+        <div class="actions" style="margin-top:4px"><button class="btn small" type="button" id="saveJenis">Simpan jenis ini ke daftar</button></div></div>`:''}
+      ${S.jenisKustom.includes(c.jenis)?`<div><button class="btn small danger" type="button" id="delJenis">Hapus jenis ini dari daftar</button></div>`:''}
+    </div>
     <div class="grid2">
       <label class="f">Mata pelajaran<input type="text" id="fMapel" value="${esc(c.mapel)}" placeholder="mis. Matematika" autocomplete="off"></label>
       <label class="f">Kelas<input type="text" id="fKelas" value="${esc(c.kelas)}" placeholder="mis. XI-2" autocomplete="off"></label>
@@ -548,26 +637,54 @@ function renderPengaturan(){
    </div>
    <div class="cta"><a class="btn primary wide" href="#pindai" id="goScan">Lanjut ke Pindai</a></div>`;
 
+  const drawAct=()=>{
+    const p=activePreset(),dirty=isDirty(),box=$('#actPanel');
+    box.innerHTML=`<h2>Ujian aktif</h2>
+      <p class="muted" style="margin-bottom:12px">Simpan pengaturan dan kunci sebagai ujian tersimpan, lalu pilih kapan saja sebagai ujian aktif. Hasil pindaian selalu masuk ke ujian aktif.</p>
+      <label class="f">Pilih ujian<select id="preSel"><option value="">Ujian baru (belum disimpan)</option>${S.presets.map(x=>`<option value="${x.id}" ${x.id===S.presetId?'selected':''}>${esc(x.name)}</option>`).join('')}</select></label>
+      <p style="margin:10px 0 0">${p?(dirty?'<span class="badge warn">Ada perubahan belum disimpan</span>':'<span class="badge ok">Tersimpan</span>'):'<span class="badge">Belum disimpan</span>'}</p>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn primary" type="button" id="preSave" ${p&&!dirty?'disabled':''}>${p?(dirty?'Simpan perubahan':'Sudah tersimpan'):'Simpan ujian ini'}</button>
+        ${p?'<button class="btn danger" type="button" id="preDel">Hapus ujian tersimpan</button>':''}
+      </div>`;
+    $('#preSel').onchange=e=>{
+      const id=e.target.value||null;
+      if(isDirty()&&(keyDone(S.cfg)>0||S.cfg.mapel)&&!confirm('Pengaturan dan kunci yang belum disimpan akan hilang. Lanjutkan?')){e.target.value=S.presetId||'';return;}
+      activate(id);renderPengaturan();renderTabs();updateActive();
+    };
+    $('#preSave').onclick=()=>{savePreset();toast('Ujian tersimpan dan aktif.');drawAct();updateActive();};
+    const pd=$('#preDel');if(pd)armBtn(pd,()=>{S.presets=S.presets.filter(x=>x.id!==S.presetId);S.presetId=null;save();toast('Ujian tersimpan dihapus. Pengaturan tetap bisa dipakai.');drawAct();updateActive();});
+  };
+  drawAct();
   const redraw=()=>{
     $('#keyCount').textContent='· '+keyDone(c)+'/'+c.n+' terisi';
     const kr={ans:c.key.slice(0,c.n).map(a=>a||''),flags:[]};
     const box=$('#keyChips');box.innerHTML=chipsHTML(kr,{n:c.n,key:[]});
     box.querySelectorAll('.chip').forEach(b=>{b.classList.remove('neutral','blank');b.classList.add(kr.ans[+b.dataset.i]?'neutral':'blank');
       b.onclick=()=>{const i=+b.dataset.i,nx=nextAns(c.key[i]||'');c.key[i]=nx==='*'?'':nx;save();redraw();};});
+    drawAct();updateActive();
   };
   redraw();
-  document.querySelectorAll('#jenis button').forEach(b=>b.onclick=()=>{c.jenis=b.dataset.j;save();document.querySelectorAll('#jenis button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));});
-  $('#fMapel').oninput=e=>{c.mapel=e.target.value.trim();save();};
-  $('#fKelas').oninput=e=>{c.kelas=e.target.value.trim();save();};
+  const touch=()=>{save();drawAct();updateActive();};
+  $('#fJenis').onchange=e=>{c.jenis=e.target.value;if(c.jenis!==LAIN)c.jenisLain='';save();renderPengaturan();updateActive();};
+  const fl=$('#fLain');if(fl)fl.oninput=e=>{c.jenisLain=e.target.value.trim();touch();};
+  const sj=$('#saveJenis');if(sj)sj.onclick=()=>{
+    const nm=(c.jenisLain||'').trim();
+    if(!nm){toast('Ketik nama jenis ujian dulu.');return;}
+    if(!JENIS.includes(nm)&&!S.jenisKustom.includes(nm))S.jenisKustom.push(nm);
+    c.jenis=nm;c.jenisLain='';save();toast('Jenis ujian disimpan ke daftar.');renderPengaturan();updateActive();};
+  const dj=$('#delJenis');if(dj)armBtn(dj,()=>{S.jenisKustom=S.jenisKustom.filter(x=>x!==c.jenis);c.jenisLain=c.jenis;c.jenis=LAIN;save();renderPengaturan();updateActive();});
+  $('#fMapel').oninput=e=>{c.mapel=e.target.value.trim();touch();};
+  $('#fKelas').oninput=e=>{c.kelas=e.target.value.trim();touch();};
   $('#fTgl').onchange=e=>{c.tanggal=e.target.value||today();save();};
   const setN=n=>{c.n=n;save();$('#fN').value=n;document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.n===n)));redraw();pending=[];};
   $('#fN').onchange=e=>{const n=Math.max(1,Math.min(NMAX,parseInt(e.target.value)||NMAX));e.target.value=n;setN(n);};
   document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>setN(+b.dataset.n));
   $('#keyApply').onclick=()=>{
-    const s=$('#keyPaste').value.toUpperCase().replace(/[^A-E]/g,'');
-    if(!s){$('#keyMsg').innerHTML='<div class="note err">Tidak ada huruf A sampai E yang bisa dibaca.</div>';return;}
-    for(let i=0;i<c.n;i++)c.key[i]=s[i]||'';
-    save();redraw();$('#keyMsg').innerHTML=`<div class="note info">${Math.min(s.length,c.n)} huruf diterapkan${s.length!==c.n?`. Jumlah huruf (${s.length}) berbeda dari jumlah soal (${c.n}).`:'.'}</div>`;
+    const t=$('#keyPaste').value.toUpperCase().replace(/[^A-E]/g,'');
+    if(!t){$('#keyMsg').innerHTML='<div class="note err">Tidak ada huruf A sampai E yang bisa dibaca.</div>';return;}
+    for(let i=0;i<c.n;i++)c.key[i]=t[i]||'';
+    save();redraw();$('#keyMsg').innerHTML=`<div class="note info">${Math.min(t.length,c.n)} huruf diterapkan${t.length!==c.n?`. Jumlah huruf (${t.length}) berbeda dari jumlah soal (${c.n}).`:'.'}</div>`;
   };
   $('#inKey').onchange=async e=>{
     const f=e.target.files[0];if(!f)return;e.target.value='';
@@ -575,20 +692,24 @@ function renderPengaturan(){
     try{
       const res=await analyze(f);
       if(!res.sheets.length){$('#keyMsg').innerHTML='<div class="note err">Penanda sudut tidak terbaca. Foto ulang lembar kunci dengan keempat kotak hitam terlihat.</div>';return;}
-      const s=res.sheets[0];
-      for(let i=0;i<c.n;i++)c.key[i]=(s.ans[i]==='*'?'':s.ans[i])||'';
+      const sh=res.sheets[0];
+      for(let i=0;i<c.n;i++)c.key[i]=(sh.ans[i]==='*'?'':sh.ans[i])||'';
       save();redraw();
-      const bad=s.flags.filter(i=>i<c.n).map(i=>i+1);
+      const bad=sh.flags.filter(i=>i<c.n).map(i=>i+1);
       $('#keyMsg').innerHTML=`<div class="note ${bad.length?'':'info'}">Kunci terbaca ${keyDone(c)} dari ${c.n} soal.${bad.length?' Periksa soal: '+bad.join(', ')+'.':''}</div>`;
     }catch(err){console.error(err);$('#keyMsg').innerHTML='<div class="note err">Foto tidak bisa diproses.</div>';}
   };
+}
+function updateActive(){
+  const c=S.cfg,p=activePreset(),bar=$('#activeBar'),h=(location.hash||'').replace('#','');
+  if(h==='pengaturan'||h===''){bar.innerHTML='';return;}
+  bar.innerHTML=`<a class="activebar" href="#pengaturan" aria-label="Ujian aktif, ketuk untuk mengubah"><span class="dot"></span><span class="tx"><small>Ujian aktif${p?'':' · belum disimpan'}</small><b>${esc(examTitle(c)||'Ujian tanpa judul')}</b></span><span class="meta">${c.n} soal<br>kunci ${keyDone(c)}/${c.n}</span></a>`;
 }
 
 /* ====== Langkah 2: Pindai ====== */
 let nextId=1;
 function updateWarn(){
   const c=S.cfg,k=keyDone(c);
-  $('#ctx').innerHTML=`<div class="ctx"><span><b>${esc(examTitle(c)||'Ujian tanpa judul')}</b> · ${c.n} soal</span><a href="#pengaturan">Ubah</a></div>`;
   $('#keyWarn').innerHTML=k<c.n?`<div class="note">Kunci jawaban baru terisi ${k} dari ${c.n} soal. <a href="#pengaturan">Lengkapi kunci</a> agar nilai akurat.</div>`:'';
 }
 function renderPending(){
@@ -684,8 +805,8 @@ function renderHasil(){
    ${R.length>=2?`<div class="panel"><h2>Soal yang paling banyak salah</h2><p class="muted" style="margin-bottom:12px">Persentase siswa yang menjawab benar.</p><div class="list" style="gap:10px">${hard.map(h=>`<div class="bar"><span>No.${h.i+1}</span><div><i style="width:${Math.max(2,h.p)}%"></i></div><span>${Math.round(h.p)}%</span></div>`).join('')}</div></div>`:''}
    <h2 style="margin:6px 2px 0">Detail per siswa</h2>
    <div id="resList" class="list"></div>
-   <div class="panel"><p class="muted" style="margin-bottom:12px">Selesai dengan ujian ini? Hasil akan tersimpan di Riwayat, lalu Anda bisa memulai ujian berikutnya.</p>
-    <button class="btn wide" id="btnNew" type="button">Mulai ujian baru</button></div>`;
+   <div class="panel"><p class="muted" style="margin-bottom:12px">Selesai dengan sesi ini? Hasil akan tersimpan di Riwayat, lalu Anda bisa lanjut ke kelas berikutnya atau ujian lain.</p>
+    <div class="stack" style="margin-top:0"><button class="btn wide" id="btnNext" type="button">Kelas berikutnya (kunci sama)</button><button class="btn wide" id="btnNew" type="button">Ujian baru</button></div></div>`;
   const rl=$('#resList');
   [...R].reverse().forEach(r=>{
     const w=document.createElement('div');
@@ -697,7 +818,8 @@ function renderHasil(){
   $('#btnArchive').onclick=()=>{archive();toast('Tersimpan di Riwayat');renderHasil();};
   $('#cpTsv').onclick=()=>copyTSV(ex,R);
   $('#dlCsv').onclick=()=>downloadCSV(ex,R);
-  $('#btnNew').onclick=()=>{archive();S.cfg=blankCfg();S.results=[];S.histId=null;pending=[];save();toast('Hasil disimpan ke Riwayat. Silakan atur ujian baru.');location.hash='#pengaturan';};
+  $('#btnNext').onclick=()=>{archive();S.cfg.kelas='';S.cfg.tanggal=today();S.results=[];S.histId=null;pending=[];save();toast('Hasil disimpan ke Riwayat. Kunci tetap dipakai, isi kelas berikutnya.');location.hash='#pengaturan';};
+  $('#btnNew').onclick=()=>{archive();activate(null);toast('Hasil disimpan ke Riwayat. Silakan atur ujian baru.');location.hash='#pengaturan';};
 }
 
 /* ====== Riwayat ====== */
@@ -734,8 +856,8 @@ function renderRiwayat(){
     card.querySelector('[data-a=tsv]').onclick=()=>copyTSV(h.cfg,h.results);
     card.querySelector('[data-a=csv]').onclick=()=>downloadCSV(h.cfg,h.results);
     const op=card.querySelector('[data-a=open]');
-    if(op)op.onclick=()=>{archive();S.cfg=clone(h.cfg);S.results=clone(h.results);S.histId=h.id;pending=[];save();toast('Ujian dibuka kembali.');location.hash='#hasil';};
-    card.querySelector('[data-a=reuse]').onclick=()=>{archive();S.cfg=Object.assign(clone(h.cfg),{tanggal:today()});delete S.cfg.judul;if(h.cfg.judul)S.cfg.mapel=h.cfg.judul;S.results=[];S.histId=null;pending=[];save();toast('Pengaturan dan kunci disalin. Silakan periksa.');location.hash='#pengaturan';};
+    if(op)op.onclick=()=>{archive();S.cfg=clone(h.cfg);S.results=clone(h.results);S.histId=h.id;S.presetId=null;pending=[];save();toast('Ujian dibuka kembali.');location.hash='#hasil';};
+    card.querySelector('[data-a=reuse]').onclick=()=>{archive();S.cfg=Object.assign(clone(h.cfg),{tanggal:today()});delete S.cfg.judul;if(h.cfg.judul)S.cfg.mapel=h.cfg.judul;S.results=[];S.histId=null;S.presetId=null;pending=[];save();toast('Pengaturan dan kunci disalin. Silakan periksa.');location.hash='#pengaturan';};
     armBtn(card.querySelector('[data-a=del]'),()=>{S.history=S.history.filter(x=>x!==h);if(S.histId===h.id)S.histId=null;save();renderRiwayat();});
   });
   $('#bkExport').onclick=()=>{dl('cadangan-koreksi-'+today()+'.json',JSON.stringify({app:'koreksi-lembar-jawab',v:2,cfg:S.cfg,results:S.results,history:S.history}),'application/json');toast('Cadangan diunduh.');};
@@ -750,6 +872,86 @@ function renderRiwayat(){
   };
 }
 
+
+/* ====== Panduan foto & kamera dalam aplikasi ====== */
+function sheetSVG(){
+  let t='<svg viewBox="-2 -2 96 200" role="img" aria-label="Contoh lembar jawab dengan penanda sudut"><rect x="0" y="0" width="92" height="196" rx="2" fill="#fff" stroke="#9fb4be" stroke-width=".8"/>';
+  t+='<circle cx="22" cy="24" r="9" fill="#E6F5FB" stroke="#8ED8F0"/><rect x="36" y="17" width="46" height="3" rx="1.5" fill="#cfdde3"/><rect x="36" y="24" width="38" height="3" rx="1.5" fill="#cfdde3"/><rect x="36" y="31" width="42" height="3" rx="1.5" fill="#cfdde3"/><rect x="10" y="50" width="72" height="9" rx="2" fill="none" stroke="#9fb4be" stroke-width=".7"/><rect x="10" y="64" width="72" height="6" rx="2" fill="none" stroke="#cfdde3" stroke-width=".6"/>';
+  for(let q=0;q<NMAX;q++)for(let k=0;k<5;k++){const [x,y]=bubbleXY(q,k);t+=`<circle cx="${x}" cy="${y}" r="1.55" fill="${(q===2&&k===1)||(q===3&&k===3)||(q===5&&k===0)?'#13242C':'none'}" stroke="#7f98a4" stroke-width=".35"/>`;}
+  const m=[[GEO.TL,7],[GEO.TR,5],[GEO.BR,5],[GEO.BL,5]];
+  m.forEach(([p,sz],i)=>{t+=`<rect x="${p[0]-sz/2}" y="${p[1]-sz/2}" width="${sz}" height="${sz}" fill="#13242C"/><circle cx="${p[0]}" cy="${p[1]}" r="${sz/2+3.2}" fill="none" stroke="#E8A91C" stroke-width="1.2"/>`;});
+  t+='<text x="46" y="108" font-size="0"></text></svg>';
+  return t;
+}
+function threeSVG(){
+  let t='<svg viewBox="0 0 330 224" role="img" aria-label="Tiga lembar per kertas, foto dengan HP mendatar"><rect x="1" y="1" width="328" height="222" rx="6" fill="none" stroke="#9fb4be" stroke-dasharray="5 4"/>';
+  for(let i=0;i<3;i++){const x=22+i*104;t+=`<rect x="${x}" y="14" width="92" height="196" rx="2" fill="#fff" stroke="#9fb4be" stroke-width=".8"/>`;
+    [[4,4,7],[88,4,5],[88,192,5],[4,192,5]].forEach(([a,b,z])=>{t+=`<rect x="${x+a-z/2}" y="${14+b-z/2}" width="${z}" height="${z}" fill="#13242C"/>`;});
+    for(let r=0;r<6;r++)t+=`<rect x="${x+12}" y="${70+r*18}" width="68" height="3" rx="1.5" fill="#dde7ec"/>`;}
+  return t+'</svg>';
+}
+function openGuide(afterCam){
+  const box=$('#guideBox');
+  box.innerHTML=`<div class="sheetbox" role="dialog" aria-modal="true" aria-label="Panduan memotret lembar jawab">
+    <div class="eyebrow">Panduan foto</div><h2>Cara memotret lembar jawab</h2>
+    <div class="gd"><div>${sheetSVG()}</div>
+      <ol class="gsteps">
+        <li><b>Empat kotak hitam</b> di sudut (cincin kuning pada gambar) harus masuk bingkai. Kotak terbesar ada di kiri atas.</li>
+        <li>Letakkan kertas <b>rata</b> di meja, tidak terlipat atau melengkung.</li>
+        <li>Foto dari atas dengan HP sejajar kertas, jarak sekitar 30 sampai 40 cm sampai kertas memenuhi bingkai.</li>
+        <li>Cahaya merata. Hindari bayangan tangan atau HP, dan pantulan lampu.</li>
+      </ol></div>
+    <div class="gd3">${threeSVG()}<p class="muted"><b>Tiga lembar sekaligus:</b> putar HP mendatar, masukkan seluruh kertas A4 atau F4 ke dalam bingkai. <b>Satu lembar:</b> HP tegak, bingkai pas satu lembar.</p></div>
+    <div class="dd"><div class="do"><b>Sudah benar</b><ul><li>Semua sudut terlihat utuh</li><li>Foto tajam, tidak goyang</li><li>Bulatan terisi penuh dan hitam</li></ul></div>
+      <div class="dont"><b>Hindari</b><ul><li>Sudut terpotong atau tertutup jari</li><li>Bayangan tebal atau silau</li><li>Kertas terlipat atau miring tajam</li></ul></div></div>
+    <div class="actions"><button class="btn" type="button" id="gClose">Tutup</button>${afterCam?'<button class="btn primary" type="button" id="gGo">Mengerti, buka kamera</button>':''}</div>
+  </div>`;
+  box.hidden=false;document.body.style.overflow='hidden';
+  const close=()=>{box.hidden=true;box.innerHTML='';if($('#camBox').hidden)document.body.style.overflow='';};
+  box.onclick=e=>{if(e.target===box)close();};
+  $('#gClose').onclick=close;
+  const go=$('#gGo');if(go)go.onclick=()=>{close();openCam();};
+  try{localStorage.setItem('koreksi-panduan','1');}catch(e){}
+}
+let camStream=null,camMode=3;
+function guideSeen(){try{return localStorage.getItem('koreksi-panduan')==='1';}catch(e){return true;}}
+async function openCam(){
+  const box=$('#camBox');box.hidden=false;document.body.style.overflow='hidden';
+  $('#camMsg').textContent='Membuka kamera…';drawGuide();
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){$('#camMsg').innerHTML='Kamera langsung tidak tersedia di peramban ini.<br>Ketuk <b>Kamera bawaan HP</b> di bawah.';return;}
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:3840},height:{ideal:2160}},audio:false});
+    const v=$('#camVideo');v.srcObject=camStream;try{await v.play();}catch(e){}
+    $('#camMsg').textContent='';drawGuide();
+  }catch(e){$('#camMsg').innerHTML='Izin kamera ditolak atau kamera tidak tersedia.<br>Ketuk <b>Kamera bawaan HP</b> di bawah, atau izinkan kamera di pengaturan peramban.';}
+}
+function closeCam(){
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
+  const v=$('#camVideo');v.srcObject=null;$('#camBox').hidden=true;document.body.style.overflow='';
+}
+function drawGuide(){
+  const st=$('#camStage'),W=st.clientWidth,H=st.clientHeight,svg=$('#camSvg');if(!W||!H)return;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const units=camMode===3?288:92,asp=units/196;
+  let h=Math.min(H*.94,W*.94/asp),w=h*asp,k=w/units,x0=(W-w)/2,y0=(H-h)/2;
+  let g='';
+  for(let i=0;i<camMode;i++){
+    const x=x0+i*98*k;
+    g+=`<rect x="${x}" y="${y0}" width="${92*k}" height="${196*k}" rx="${3*k}" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.85)" stroke-width="1.6" stroke-dasharray="7 5"/>`;
+    [[4,4,7],[88,4,5],[88,192,5],[4,192,5]].forEach(([a,b,z])=>{const cs=Math.max(11,z*k*1.5);g+=`<rect x="${x+a*k-cs/2}" y="${y0+b*k-cs/2}" width="${cs}" height="${cs}" rx="3" fill="none" stroke="#E8A91C" stroke-width="2.4"/>`;});
+  }
+  svg.innerHTML=g;
+  const portrait=W<H;
+  $('#camHint').innerHTML=camMode===3
+    ?(portrait?'<b>Putar HP mendatar.</b> ':'')+'Masukkan ketiga lembar ke dalam bingkai. Setiap kotak hitam sudut harus berada di dalam kotak kuning.'
+    :'Masukkan satu lembar ke dalam bingkai. Keempat kotak hitam sudut harus berada di dalam kotak kuning.';
+}
+function shoot(){
+  const v=$('#camVideo');if(!v.videoWidth){toast('Kamera belum siap.');return;}
+  const cv=document.createElement('canvas');cv.width=v.videoWidth;cv.height=v.videoHeight;cv.getContext('2d').drawImage(v,0,0);
+  cv.toBlob(b=>{if(!b){toast('Gagal mengambil foto.');return;}closeCam();handleFiles([b]);},'image/jpeg',.92);
+}
+
 /* ====== Rute dan tema ====== */
 const VIEWS=['pengaturan','pindai','hasil','riwayat'];
 function renderTabs(){$('#cntHasil').textContent=S.results.length?String(S.results.length):'';}
@@ -757,7 +959,7 @@ function route(){
   let h=(location.hash||'').replace('#','');if(!VIEWS.includes(h))h='pengaturan';
   VIEWS.forEach(n=>{$('#v-'+n).hidden=n!==h;const t=$('#t-'+n);if(n===h)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current');});
   if(h==='pengaturan')renderPengaturan();if(h==='pindai')renderPending();if(h==='hasil')renderHasil();if(h==='riwayat')renderRiwayat();
-  renderTabs();window.scrollTo(0,0);
+  renderTabs();updateActive();window.scrollTo(0,0);
 }
 const TH='koreksi-tema';
 const ICON_SUN='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
@@ -771,7 +973,14 @@ function initTheme(){
   syncTheme();
 }
 function init(){
-  load();initTheme();
+  load();fixS();initTheme();
+  $('#btnCam').onclick=()=>{if(guideSeen())openCam();else openGuide(true);};
+  $('#btnGuide').onclick=()=>openGuide(false);
+  $('#camClose').onclick=closeCam;$('#camShot').onclick=shoot;$('#camHelp').onclick=()=>openGuide(false);
+  document.querySelectorAll('.cam-seg button').forEach(b=>b.onclick=()=>{camMode=+b.dataset.m;document.querySelectorAll('.cam-seg button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));drawGuide();});
+  addEventListener('resize',()=>{if(!$('#camBox').hidden)drawGuide();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden&&camStream)closeCam();});
+  $('#inCam').addEventListener('change',()=>{if(!$('#camBox').hidden)closeCam();});
   $('#inCam').onchange=e=>{const f=[...e.target.files];e.target.value='';handleFiles(f);};
   $('#inGal').onchange=e=>{const f=[...e.target.files];e.target.value='';handleFiles(f);};
   $('#btnDemo').onclick=e=>{

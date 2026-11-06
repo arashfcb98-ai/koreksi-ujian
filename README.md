@@ -6,7 +6,7 @@ Oleh **Aras Hidayat, S.Pd**, SMA Negeri 3 Paloh, Kabupaten Sambas.
 
 ## Alur
 1. **Pengaturan**: pilih jenis ujian, isi mata pelajaran, kelas, tanggal, jumlah soal, dan kunci jawaban (tempel huruf, pindai lembar kunci, atau ketuk manual).
-2. **Pindai**: foto lembar jawab (kamera atau galeri), periksa, lalu Simpan.
+2. **Pindai**: foto lembar jawab (kamera dalam aplikasi dengan bingkai panduan, atau galeri; ada juga Panduan foto), periksa, lalu Simpan.
 3. **Hasil**: rata-rata, peringkat, soal tersulit, detail per siswa. Salin untuk Excel, unduh CSV, atau Simpan ke Riwayat.
 4. **Riwayat**: daftar ujian tersimpan. Bisa dilanjutkan, dipakai ulang kuncinya, diekspor, atau dihapus. Tersedia cadangan dan pemulihan (JSON).
 
