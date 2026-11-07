@@ -1024,7 +1024,6 @@ function renderPengaturan(){
    <div class="card" data-sec="lembar"><h2>Lembar jawab</h2>
       <p class="muted" style="margin-bottom:12px">Cetak 50 soal, tiga lembar per kertas. Aplikasi hanya membaca lembar dengan empat kotak hitam di sudut.</p>
       <div class="grid2"><a class="btn" href="lembar/LEMBAR_JAWAB_A4.pdf" target="_blank" rel="noopener">Unduh A4</a><a class="btn" href="lembar/LEMBAR_JAWAB_F4.pdf" target="_blank" rel="noopener">Unduh F4</a></div></div>
-   ${!draft&&hasExam()?`<button class="btn small danger" id="exDel" data-sec="jenis" type="button" style="align-self:flex-start">Hapus ujian ini beserta hasilnya</button>`:''}
    <div class="dock" id="dock"><div class="dock-in"><div class="info" id="dockInfo"></div><button class="btn soft" id="dkSave" type="button" aria-label="Simpan pengaturan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>Simpan</button><button class="btn primary" id="goScan" type="button"></button></div></div>`;
   const showSec=()=>{document.querySelectorAll('#v-pengaturan [data-sec]').forEach(el=>{el.hidden=el.dataset.sec!==pTab;});document.querySelectorAll('#pTabs button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===pTab)));
     const dk=$('#dock');dk.dataset.tab=pTab;$('#dkSave').hidden=!(pTab==='jenis'&&(!!draft||validEx(ex).length>0));
@@ -1084,9 +1083,6 @@ function renderPengaturan(){
     save();redraw();$('#keyMsg').innerHTML=`<div class="note ${s.length===ex.n?'ok':'info'}">${Math.min(s.length,ex.n)} huruf diterapkan${s.length!==ex.n?`. Jumlah huruf (${s.length}) berbeda dari jumlah soal (${ex.n}).`:'.'}</div>`;
   };
   const kc=$('#keyClear');let ka=false;kc.onclick=()=>{if(!ka){ka=true;kc.textContent='Ketuk lagi untuk mengosongkan';setTimeout(()=>{ka=false;kc.textContent='Kosongkan kunci';},3000);return;}ex.key=Array(NMAX).fill('');save();redraw();};
-  const dl=$('#exDel');
-  if(dl){let a=false;dl.onclick=()=>{if(!a){a=true;dl.textContent='Ketuk lagi untuk menghapus';setTimeout(()=>{a=false;dl.textContent='Hapus ujian ini beserta hasilnya';},3000);return;}
-    S.exams=S.exams.filter(x=>x!==ex);S.cur=S.exams[0]?S.exams[0].id:null;save();pending=[];sessionSaved=0;renderPengaturan();renderTabs();};}
   $('#keyCam').onclick=()=>openCamera(scanKeyFile,{fallbackFor:'inKey'});
   $('#dkSave').onclick=()=>{if(commit())toast('Jenis ujian tersimpan');};
   $('#goScan').onclick=()=>{if(!commit())return;

@@ -1,7 +1,8 @@
 {
+  "id": "/koreksi-lembar-jawab",
   "name": "Koreksi Lembar Jawab",
   "short_name": "Lembar Jawab",
-  "description": "Koreksi lembar jawab pilihan ganda otomatis dari foto",
+  "description": "Koreksi lembar jawab pilihan ganda otomatis dari foto, langsung di HP.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -9,18 +10,52 @@
   "background_color": "#FFFFFF",
   "theme_color": "#0A6FA3",
   "lang": "id",
+  "dir": "ltr",
+  "categories": [
+    "education",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/sampul.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Sampul"
+    },
+    {
+      "src": "screenshots/hasil.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Pindai lembar jawab"
+    },
+    {
+      "src": "screenshots/pengaturan.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Pengaturan kunci jawaban"
     }
   ]
 }

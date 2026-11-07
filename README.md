@@ -79,3 +79,8 @@ Aplikasi hanya membaca lembar yang memiliki empat kotak hitam di sudut.
 ## Sampul
 
 Saat aplikasi pertama kali dibuka pada hari itu di sebuah HP atau browser, muncul halaman sampul berisi deskripsi singkat dan nama pembuat. Ketuk **Mulai Mengoreksi** untuk masuk ke menu Pengaturan. Setelah itu sampul tidak muncul lagi sampai keesokan harinya (sekali per hari). Untuk melihatnya lagi, ketuk logo sekolah di bagian atas aplikasi (tombol Esc di laptop menutupnya).
+
+
+## Membuat APK Android
+
+Lihat berkas PANDUAN_APK.md (cara lengkap memakai PWABuilder).
