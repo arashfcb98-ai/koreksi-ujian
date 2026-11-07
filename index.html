@@ -167,11 +167,34 @@ details.plain>summary::-webkit-details-marker{display:none}
 .pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.bad{background:var(--bad-bg);color:var(--bad)}
 .pill.blank{background:var(--blank-bg);color:var(--muted)} .pill.warn{background:var(--warn-bg);color:var(--warn)}
 .detail{border-top:1px solid var(--line)}
-.detail>summary{padding:13px 16px;cursor:pointer;font-weight:700;font-size:14px;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:48px}
+.detail>summary{display:none!important;padding:13px 16px;cursor:pointer;font-weight:700;font-size:14px;list-style:none;display:flex;justify-content:space-between;align-items:center;min-height:48px}
 .detail>summary::-webkit-details-marker{display:none}
 .detail>summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin-right:4px;transition:transform .15s}
 .detail[open]>summary::after{transform:rotate(-135deg)}
 .detail .in{padding:0 16px 16px;display:flex;flex-direction:column;gap:12px}
+.nmrow{display:flex;gap:6px;align-items:center}.nmrow .nm{flex:1;min-width:0}
+.ib{flex:none;width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
+.ib svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ib[aria-pressed=true]{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.res.hl{border-color:var(--accent)}
+.detail .in{padding-top:12px}
+.htabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:56px;font-size:12.5px;padding:6px 2px}
+.htabs svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rk{padding:6px 0;display:flex;flex-direction:column}
+.rk-row{appearance:none;-webkit-appearance:none;display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--line);padding:12px 16px;min-height:56px;color:var(--ink);font:inherit;cursor:pointer}
+.rk-row:last-child{border-bottom:0}
+.rk-no{line-height:1;flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:14px;background:var(--blank-bg);color:var(--muted)}
+.rk-no.top{background:var(--warn-bg);color:var(--warn)}.rk-no.r1{background:var(--accent);color:var(--accent-ink)}
+.rk-nm{flex:1;min-width:0;font-weight:700;font-size:15px;overflow-wrap:anywhere}.rk-nm small{display:block;font-weight:500;font-size:12.5px;color:var(--muted)}
+.rk-sc{font-family:var(--mono);font-size:20px;font-weight:600}
+.lvl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.lv{border-radius:12px;padding:10px 6px;text-align:center;font-size:12.5px;font-weight:600}.lv b{display:block;font-family:var(--mono);font-size:24px}
+.lv.mudah{background:var(--ok-bg);color:var(--ok)}.lv.sedang{background:var(--warn-bg);color:var(--warn)}.lv.sulit{background:var(--bad-bg);color:var(--bad)}
+.qa{display:flex;flex-direction:column;gap:7px}
+.qa-r{display:grid;grid-template-columns:26px 1fr 38px 64px;gap:8px;align-items:center;font-family:var(--mono);font-size:12.5px}
+.qa-n{color:var(--muted);text-align:right}.qa-p{text-align:right}.qa-w{font-size:11.5px;color:var(--muted)}
+.qa-b{background:var(--blank-bg);border-radius:5px;height:9px}.qa-b i{display:block;height:100%;border-radius:5px;background:var(--accent)}
+.qa-r.mudah .qa-b i{background:var(--ok)}.qa-r.sulit .qa-b i{background:var(--bad)}.qa-r.sedang .qa-b i{background:var(--warn)}
 .res-actions{display:flex;gap:10px;padding:12px 16px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
 .res-actions .btn{flex:1 1 120px}
 canvas.sheet{width:100%;height:auto;border-radius:10px;border:1px solid var(--line);background:#fff;display:block}
@@ -566,7 +589,9 @@ function cardHTML(r,ex,opt){
       <div class="res-score"><b>${fmt(g.nilai)}</b><small>${g.ok}/${ex.n} benar</small></div>
       <div class="res-main">
         <div class="lbl">${esc(opt.label)}</div>
-        <input type="text" class="nm" value="${esc(r.name||'')}" placeholder="Nama siswa atau no. peserta" autocomplete="off" aria-label="Nama siswa">
+        <div class="nmrow"><input type="text" class="nm" value="${esc(r.name||'')}" placeholder="Nama siswa" autocomplete="off" aria-label="Nama siswa">
+          <button type="button" class="ib" data-t="ans" aria-label="Jawaban per soal" aria-pressed="${flags.length&&!r.saved&&opt.autoOpen?'true':'false'}" title="Jawaban per soal"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg></button>
+          ${r.rect?'<button type="button" class="ib" data-t="sheet" aria-label="Lihat lembar dengan penanda" aria-pressed="false" title="Lihat lembar dengan penanda"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>':''}</div>
         <div class="pills"><span class="pill ok">Benar ${g.ok}</span><span class="pill bad">Salah ${g.bad}</span><span class="pill blank">Kosong ${g.blank}</span>${flags.length?`<span class="pill warn">Cek: ${flags.slice(0,6).join(', ')}${flags.length>6?'…':''}</span>`:''}</div>
       </div>
     </div>
@@ -578,7 +603,7 @@ function cardHTML(r,ex,opt){
         <p class="muted">Ketuk kotak soal untuk mengganti jawaban (A, B, C, D, E, kosong).${w.length?'<br>Salah: '+w.join(', ')+'.':''}${b.length?'<br>Kosong: '+b.join(', ')+'.':''}${m.length?'<br>Ganda: '+m.join(', ')+'.':''}</p>
       </div>
     </details>
-    ${r.rect?`<details class="detail sheetd"><summary>Lihat lembar dengan penanda</summary><div class="in"><canvas class="sheet"></canvas><p class="muted">Hijau: benar. Merah: jawaban siswa yang salah. Hijau putus-putus: kunci yang seharusnya. Oranye: kosong atau ganda.</p></div></details>`:''}
+    ${r.rect?`<details class="detail sheetd"><summary>Lembar dengan penanda</summary><div class="in"><canvas class="sheet"></canvas><p class="muted">Hijau: benar. Merah: jawaban siswa yang salah. Hijau putus-putus: kunci yang seharusnya. Oranye: kosong atau ganda.</p></div></details>`:''}
     <div class="res-actions">${opt.actions}</div>
   </div>`;
 }
@@ -587,6 +612,11 @@ function wireCard(card,r,ex,onChange){
   card.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i;r.ans[i]=nextAns(r.ans[i]);r.flags=(r.flags||[]).filter(x=>x!==i);onChange(true);}));
   const sd=card.querySelector('.sheetd');
   if(sd)sd.addEventListener('toggle',()=>{if(sd.open)paintSheet(sd.querySelector('canvas'),r,ex);});
+  card.querySelectorAll('.ib').forEach(b=>{
+    const d=card.querySelector(b.dataset.t==='ans'?'.ans':'.sheetd');if(!d)return;
+    b.setAttribute('aria-pressed',d.open?'true':'false');
+    b.addEventListener('click',()=>{d.open=!d.open;b.setAttribute('aria-pressed',d.open?'true':'false');});
+  });
 }
 
 /* ====== Pindai ====== */
@@ -624,7 +654,7 @@ function renderPending(){
     card.querySelector('[data-a=drop]').onclick=()=>{pending=pending.filter(p=>p!==r);renderPending();};
     const sv=card.querySelector('[data-a=save]');
     if(sv)sv.onclick=()=>{saveOne(r);toast('Hasil tersimpan');renderPending();renderTabs();};
-    card.querySelectorAll('details').forEach(d=>{const key=r.id+'|'+(d.classList.contains('sheetd')?'s':'a');if(open.has(key))d.open=true;});
+    card.querySelectorAll('details').forEach(d=>{const key=r.id+'|'+(d.classList.contains('sheetd')?'s':'a');if(open.has(key)){d.open=true;card.querySelector(`.ib[data-t="${d.classList.contains('sheetd')?'sheet':'ans'}"]`)?.setAttribute('aria-pressed','true');}});
     const sd=card.querySelector('.sheetd');if(sd&&sd.open)paintSheet(sd.querySelector('canvas'),r,ex);
   });
 }
@@ -679,6 +709,12 @@ function restoreFrom(text){
   if(!S.exams.find(e=>e.id===S.cur))S.cur=S.exams[0].id;
   save();return {ok:true,ujian:j.exams.length,siswa};
 }
+let hTab='peringkat';
+const HI={
+  rank:'<svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3"/></svg>',
+  chart:'<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>'
+};
 function renderHasil(){
   const ex=exam(),v=$('#v-hasil'),R=ex.results;
   const head=`<div class="page-h"><h1>Hasil</h1><p>${esc(examName(ex))}</p></div>`;
@@ -696,17 +732,54 @@ function renderHasil(){
     wireTools(ex);return;
   }
   const gs=R.map(r=>grade(r.ans,ex).nilai),avg=gs.reduce((a,b)=>a+b,0)/gs.length;
-  const pc=[];for(let i=0;i<ex.n;i++){let c=0;R.forEach(r=>{if(ex.key[i]&&r.ans[i]===ex.key[i])c++;});pc.push(c/R.length*100);}
-  const hard=pc.map((p,i)=>({i,p})).sort((a,b)=>a.p-b.p).slice(0,5);
   v.innerHTML=head+`
    <div class="card"><div class="stats">
       <div class="stat"><b>${R.length}</b><span>siswa</span></div><div class="stat"><b>${fmt(avg)}</b><span>rata-rata</span></div>
       <div class="stat"><b>${fmt(Math.max(...gs))}</b><span>tertinggi</span></div><div class="stat"><b>${fmt(Math.min(...gs))}</b><span>terendah</span></div></div></div>
-   ${tools}
-   <div class="split" style="align-items:center"><div class="sec-t" style="margin:0">Daftar siswa</div>
+   <div class="seg three htabs" id="hTabs" role="tablist">
+     <button type="button" role="tab" data-t="peringkat" aria-pressed="${hTab==='peringkat'}">${HI.rank}<span>Peringkat</span></button>
+     <button type="button" role="tab" data-t="soal" aria-pressed="${hTab==='soal'}">${HI.chart}<span>Analisis soal</span></button>
+     <button type="button" role="tab" data-t="siswa" aria-pressed="${hTab==='siswa'}">${HI.user}<span>Detail siswa</span></button></div>
+   <div id="hBody" class="stack"></div>
+   ${tools}`;
+  document.querySelectorAll('#hTabs button').forEach(b=>b.onclick=()=>{hTab=b.dataset.t;renderHasil();});
+  const body=$('#hBody');
+  if(hTab==='peringkat')hasilPeringkat(body,ex,R);
+  else if(hTab==='soal')hasilSoal(body,ex,R);
+  else hasilSiswa(body,ex,R);
+  wireTools(ex);
+}
+function hasilPeringkat(body,ex,R){
+  const L=R.map(r=>({r,g:grade(r.ans,ex)})).sort((a,b)=>b.g.nilai-a.g.nilai||(a.r.name||'~').localeCompare(b.r.name||'~','id'));
+  let rank=0,prev=null;
+  L.forEach((x,i)=>{if(x.g.nilai!==prev){rank=i+1;prev=x.g.nilai;}x.rank=rank;});
+  body.innerHTML=`<div class="card rk">${L.map(x=>`<button type="button" class="rk-row" data-id="${x.r.id}"><span class="rk-no ${x.rank<=3?'top r'+x.rank:''}">${x.rank}</span><span class="rk-nm">${esc(x.r.name||'Tanpa nama')}<small>${x.g.ok} benar · ${x.g.bad} salah · ${x.g.blank} kosong</small></span><b class="rk-sc">${fmt(x.g.nilai)}</b></button>`).join('')}</div>
+   <p class="muted">Ketuk nama untuk membuka detail siswa.</p>`;
+  body.querySelectorAll('.rk-row').forEach(b=>b.onclick=()=>{hTab='siswa';focusId=b.dataset.id;renderHasil();});
+}
+let focusId=null;
+function hasilSoal(body,ex,R){
+  const rows=[];
+  for(let i=0;i<ex.n;i++){
+    let c=0;const cnt={A:0,B:0,C:0,D:0,E:0};
+    R.forEach(r=>{const a=r.ans[i];if(ex.key[i]&&a===ex.key[i])c++;else if(cnt[a]!==undefined)cnt[a]++;});
+    const wr=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+    rows.push({i,p:c/R.length*100,pick:wr&&wr[1]>0?wr[0]:'',has:!!ex.key[i]});
+  }
+  const lv=p=>p>=70?'mudah':p>=40?'sedang':'sulit';
+  const n={mudah:0,sedang:0,sulit:0};rows.forEach(r=>{if(r.has)n[lv(r.p)]++;});
+  const hard=rows.filter(r=>r.has).sort((a,b)=>a.p-b.p).slice(0,5);
+  body.innerHTML=`<div class="card"><h2>Tingkat kesukaran</h2>
+    <div class="lvl"><span class="lv mudah"><b>${n.mudah}</b>mudah</span><span class="lv sedang"><b>${n.sedang}</b>sedang</span><span class="lv sulit"><b>${n.sulit}</b>sulit</span></div>
+    <p class="muted" style="margin-top:10px">Mudah: 70% ke atas benar. Sedang: 40–69%. Sulit: di bawah 40%.${R.length<5?' Dengan siswa sedikit, angka ini baru perkiraan kasar.':''}</p></div>
+   ${hard.length?`<div class="card"><h2>5 soal paling sulit</h2><div class="bars">${hard.map(h=>`<div class="bar"><span>No.${h.i+1}</span><div><i style="width:${Math.max(2,h.p)}%"></i></div><span>${Math.round(h.p)}%</span></div>`).join('')}</div></div>`:''}
+   <div class="card"><h2>Semua soal</h2><div class="qa">${rows.map(r=>`<div class="qa-r ${r.has?lv(r.p):''}"><span class="qa-n">${r.i+1}</span><div class="qa-b"><i style="width:${r.has?Math.max(2,r.p):0}%"></i></div><span class="qa-p">${r.has?Math.round(r.p)+'%':'–'}</span><span class="qa-w">${r.pick&&r.p<100?'salah: '+r.pick:''}</span></div>`).join('')}</div>
+    <p class="muted" style="margin-top:10px">Persentase siswa yang menjawab benar. "salah: C" berarti pilihan keliru yang paling sering dipilih.${keyDone(ex)<ex.n?' Soal tanpa kunci diberi tanda –.':''}</p></div>`;
+}
+function hasilSiswa(body,ex,R){
+  body.innerHTML=`<div class="split" style="align-items:center"><div class="sec-t" style="margin:0">Daftar siswa</div>
      <div class="seg three" style="min-width:210px" id="sortSeg"><button type="button" data-s="baru" aria-pressed="${sortBy==='baru'}">Terbaru</button><button type="button" data-s="nilai" aria-pressed="${sortBy==='nilai'}">Nilai</button><button type="button" data-s="nama" aria-pressed="${sortBy==='nama'}">Nama</button></div></div>
-   <div id="resList" class="stack"></div>
-   ${R.length>=2?`<div class="card"><h2>Soal yang paling banyak salah</h2><div class="bars">${hard.map(h=>`<div class="bar"><span>No.${h.i+1}</span><div><i style="width:${Math.max(2,h.p)}%"></i></div><span>${Math.round(h.p)}%</span></div>`).join('')}</div><p class="muted" style="margin-top:10px">Persentase siswa yang menjawab benar.</p></div>`:''}`;
+   <div id="resList" class="stack"></div>`;
   let list=R.map(r=>({r,g:grade(r.ans,ex).nilai}));
   if(sortBy==='baru')list.reverse();else if(sortBy==='nilai')list.sort((a,b)=>b.g-a.g);else list.sort((a,b)=>(a.r.name||'~').localeCompare(b.r.name||'~','id'));
   const rl=$('#resList');
@@ -714,13 +787,13 @@ function renderHasil(){
     const w=document.createElement('div');
     w.innerHTML=cardHTML(r,ex,{label:new Date(r.ts).toLocaleString('id-ID',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),actions:'<button class="btn small danger" data-a="del" type="button">Hapus</button>'});
     const card=w.firstElementChild;rl.appendChild(card);
-    wireCard(card,r,ex,rr=>{save();if(rr){const o=card.querySelector('.ans').open,id=r.id;renderHasil();const c=document.querySelector(`[data-id="${id}"] .ans`);if(c&&o)c.open=true;}});
+    wireCard(card,r,ex,rr=>{save();if(rr){const id=r.id,o=['.ans','.sheetd'].map(s=>card.querySelector(s)?.open);renderHasil();const c=document.querySelector(`[data-id="${id}"]`);if(c){['.ans','.sheetd'].forEach((s,k)=>{const d=c.querySelector(s);if(d&&o[k]){d.open=true;c.querySelector(`.ib[data-t="${k?'sheet':'ans'}"]`)?.setAttribute('aria-pressed','true');}});}}});
     const del=card.querySelector('[data-a=del]');let armed=false;
     del.onclick=()=>{if(!armed){armed=true;del.textContent='Ketuk lagi untuk menghapus';setTimeout(()=>{armed=false;del.textContent='Hapus';},3000);return;}
       ex.results=ex.results.filter(x=>x!==r);save();renderHasil();renderTabs();};
   });
   document.querySelectorAll('#sortSeg button').forEach(b=>b.onclick=()=>{sortBy=b.dataset.s;renderHasil();});
-  wireTools(ex);
+  if(focusId){const c=document.querySelector(`[data-id="${focusId}"]`);focusId=null;if(c){c.classList.add('hl');setTimeout(()=>c.scrollIntoView({block:'center'}),50);}}
 }
 function wireTools(ex){
   const msg=t=>{$('#saveMsg').innerHTML=t;};
