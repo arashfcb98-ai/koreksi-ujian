@@ -78,4 +78,4 @@ Aplikasi hanya membaca lembar yang memiliki empat kotak hitam di sudut.
 
 ## Sampul
 
-Saat aplikasi dibuka pertama kali di sebuah HP atau browser, muncul halaman sampul berisi deskripsi singkat dan nama pembuat. Ketuk **Mulai Mengoreksi** untuk masuk ke menu Pengaturan. Sampul tidak muncul lagi di kunjungan berikutnya. Untuk melihatnya lagi, ketuk logo sekolah di bagian atas aplikasi (tombol Esc di laptop menutupnya).
+Saat aplikasi pertama kali dibuka pada hari itu di sebuah HP atau browser, muncul halaman sampul berisi deskripsi singkat dan nama pembuat. Ketuk **Mulai Mengoreksi** untuk masuk ke menu Pengaturan. Setelah itu sampul tidak muncul lagi sampai keesokan harinya (sekali per hari). Untuk melihatnya lagi, ketuk logo sekolah di bagian atas aplikasi (tombol Esc di laptop menutupnya).

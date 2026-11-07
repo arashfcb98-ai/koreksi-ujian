@@ -389,6 +389,14 @@ body{background-color:var(--bg);background-image:linear-gradient(180deg,var(--bg
 .cover-go:active{transform:translateY(1px)}
 .cover :focus-visible{outline:3px solid #6CC6EC;outline-offset:3px}
 .logo.again{cursor:pointer}
+.dock-in{gap:8px}
+.dock-in .info{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dock-in .btn[hidden]{display:none}
+.dock-in #dkSave{padding:0 14px}
+@media (max-width:440px){.dock[data-tab=jenis] .info{display:none}.dock[data-tab=jenis] .dock-in{justify-content:flex-end}.dock[data-tab=jenis] #dkSave{flex:1}.dock[data-tab=jenis] #goScan{flex:1.4}}
+.ibtn{width:46px;min-width:46px;min-height:46px;padding:0;display:grid;place-items:center;border-radius:14px}
+.ibtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+[aria-invalid=true]{border-color:var(--bad)!important;box-shadow:0 0 0 3px var(--bad-bg)}
 </style>
 </head>
 <body>
@@ -490,12 +498,13 @@ function load(){
     const r=localStorage.getItem(LS)||localStorage.getItem('koreksi-lembar-jawab-v1-50')||localStorage.getItem('koreksi-lembar-jawab-v1');
     if(r){const j=JSON.parse(r);if(j&&Array.isArray(j.exams)&&j.exams.length){S=migrate(j);if(!S.exams.find(e=>e.id===S.cur))S.cur=S.exams[0].id;return;}}
   }catch(e){}
-  const d=newExam({mapel:'Contoh',kelas:'X',key:DEMO_KEY.split(''),demo:true});
-  S={exams:[d],cur:d.id};
+  S={exams:[],cur:null};
 }
 function save(){try{localStorage.setItem(LS,JSON.stringify(S));}catch(e){}}
-const exam=()=>S.exams.find(e=>e.id===S.cur)||S.exams[0];
-const examName=ex=>[ex.jenis,ex.mapel,ex.kelas&&('Kelas '+ex.kelas)].filter(Boolean).join(' · ')||'Ujian tanpa nama';
+const NOEXAM={id:'',jenis:'',mapel:'',kelas:'',n:NMAX,key:Array(NMAX).fill(''),results:[],none:true};
+const hasExam=()=>S.exams.length>0;
+const exam=()=>S.exams.find(e=>e.id===S.cur)||S.exams[0]||NOEXAM;
+const examName=ex=>ex.none?'Belum ada ujian':[ex.jenis,ex.mapel,ex.kelas&&('Kelas '+ex.kelas)].filter(Boolean).join(' · ')||'Ujian tanpa nama';
 let pending=[],sessionSaved=0,nextId=1;
 
 /* ====== Util ====== */
@@ -763,6 +772,7 @@ function wireCard(card,r,ex,onChange){
 /* ====== Pindai ====== */
 function renderPHead(){
   const ex=exam(),k=keyDone(ex),h=$('#pHead');
+  if(!hasExam()){h.innerHTML='<div class="note">Belum ada ujian. Buat dulu di menu <a href="#pengaturan">Pengaturan</a> (jenis ujian dan kunci jawaban), atau coba dengan foto contoh.</div>';return;}
   h.innerHTML=`<a class="exam-chip" href="#pengaturan"><div class="t"><b>${esc(examName(ex))}</b><span>${ex.n} soal · ${k>=ex.n?'<span class="badge ok">Kunci lengkap</span>':'<span class="badge warn">Kunci '+k+'/'+ex.n+'</span>'}</span></div><em>Ubah</em></a>`
    +(k<ex.n?`<div class="note">Kunci jawaban baru terisi ${k} dari ${ex.n} soal, nilai belum akurat. <a href="#pengaturan">Lengkapi kunci</a></div>`:'')
    +(ex.demo?`<div class="note info">Ini ujian contoh dengan kunci contoh. Buat ujian Anda di menu <a href="#pengaturan">Pengaturan</a>.</div>`:'')
@@ -801,6 +811,7 @@ function renderPending(){
 }
 async function handleFiles(files){
   const list=[...files];if(!list.length)return;
+  if(!hasExam()){toast('Buat ujian dulu di menu Pengaturan');location.hash='#pengaturan';return;}
   const busy=$('#busy');
   for(let fi=0;fi<list.length;fi++){
     const lab=list.length>1?` (foto ${fi+1}/${list.length})`:'';
@@ -847,6 +858,7 @@ function restoreFrom(text){
   let add=0,siswa=0;
   j.exams.forEach(e=>{const i=S.exams.findIndex(x=>x.id===e.id);if(i>=0)S.exams[i]=e;else{S.exams.push(e);add++;}siswa+=e.results.length;});
   if(S.exams.length>1)S.exams=S.exams.filter(e=>!(e.demo&&!e.results.length&&e.mapel==='Contoh'&&j.exams.length));
+  draft=null;
   if(!S.exams.find(e=>e.id===S.cur))S.cur=S.exams[0].id;
   save();return {ok:true,ujian:j.exams.length,siswa};
 }
@@ -869,7 +881,7 @@ function renderHasil(){
       <p class="muted" style="margin-top:12px">Data tersimpan otomatis di browser HP ini. Simpan cadangan untuk memindahkan data ke HP lain atau menjaga data bila browser dibersihkan.</p>
       <div id="saveMsg" style="margin-top:10px"></div></div>`;
   if(!R.length){
-    v.innerHTML=head+`<div class="card empty"><h2>Belum ada hasil tersimpan</h2><p class="muted">Pindai lembar jawab di menu Pindai, lalu ketuk Simpan hasil. Nilai semua siswa akan terkumpul di sini.</p><a class="btn primary" href="#pindai">Mulai memindai</a></div>`+tools;
+    v.innerHTML=head+(hasExam()?`<div class="card empty"><h2>Belum ada hasil tersimpan</h2><p class="muted">Pindai lembar jawab di menu Pindai, lalu ketuk Simpan hasil. Nilai semua siswa akan terkumpul di sini.</p><a class="btn primary" href="#pindai">Mulai memindai</a></div>`:`<div class="card empty"><h2>Belum ada ujian</h2><p class="muted">Buat ujian dan isi kunci jawabannya di menu Pengaturan. Setelah itu pindai lembar jawab, dan nilainya akan terkumpul di sini.</p><a class="btn primary" href="#pengaturan">Buat ujian</a></div>`)+tools;
     wireTools(ex);return;
   }
   const gs=R.map(r=>grade(r.ans,ex).nilai),avg=gs.reduce((a,b)=>a+b,0)/gs.length;
@@ -965,33 +977,38 @@ function scanKeyFile(f){
     }catch(err){console.error(err);if($('#keyMsg'))$('#keyMsg').innerHTML='<div class="note err">Foto tidak bisa diproses.</div>';}
   });
 }
-let pTab='jenis';
+let pTab='jenis',draft=null;
+const PLUS='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+const validEx=ex=>{const m=[];if(!String(ex.jenis||'').trim())m.push('jenis');if(!String(ex.mapel||'').trim())m.push('mapel');if(!String(ex.kelas||'').trim())m.push('kelas');return m;};
 const PI={
   jenis:'<svg viewBox="0 0 24 24"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z"/><path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M8 12h8M8 16h5"/></svg>',
   kunci:'<svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3M14 9l2 2"/></svg>',
   lembar:'<svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>'
 };
 function renderPengaturan(){
-  const ex=exam(),v=$('#v-pengaturan');
-  const preset=JENIS.includes(ex.jenis),jsel=preset?ex.jenis:'__lain';
+  if(!draft&&!hasExam())draft=newExam({jenis:''});
+  const ex=draft||exam(),v=$('#v-pengaturan');
+  if(draft)pTab='jenis';
+  const preset=JENIS.includes(ex.jenis),jsel=!ex.jenis?'':preset?ex.jenis:'__lain';
   v.innerHTML=`
    <div class="page-h"><h1>Pengaturan ujian</h1><p>Atur jenis ujian dan kunci jawaban. Perubahan tersimpan otomatis.</p></div>
    <div class="card"><div class="split">
-      <label class="f">Ujian aktif<select id="exSel">${S.exams.map(e=>`<option value="${e.id}" ${e.id===ex.id?'selected':''}>${esc(examName(e))}</option>`).join('')}</select></label>
-      <button class="btn small" id="exNew" type="button" style="min-height:46px">+ Baru</button></div></div>
+      <label class="f">Ujian aktif<select id="exSel">${draft?`<option value="__draft" selected>${S.exams.length?'Ujian baru (belum disimpan)':'Belum ada ujian'}</option>`:''}${S.exams.map(e=>`<option value="${e.id}" ${!draft&&e.id===ex.id?'selected':''}>${esc(examName(e))}</option>`).join('')}</select></label>
+      <button class="btn small ibtn" id="exNew" type="button" aria-label="Buat ujian baru" title="Buat ujian baru">${PLUS}</button></div></div>
    <div class="seg three htabs" id="pTabs" role="tablist" aria-label="Bagian pengaturan">
      <button type="button" role="tab" data-t="jenis" aria-pressed="${pTab==='jenis'}">${PI.jenis}<span>Jenis Ujian</span></button>
      <button type="button" role="tab" data-t="kunci" aria-pressed="${pTab==='kunci'}">${PI.kunci}<span>Kunci Jawaban</span></button>
      <button type="button" role="tab" data-t="lembar" aria-pressed="${pTab==='lembar'}">${PI.lembar}<span>Lembar Jawab</span></button></div>
    <div class="card" data-sec="jenis"><h2>Jenis ujian</h2><div class="stack">
-      <label class="f">Jenis<select id="exJenis">${JENIS.map(j=>`<option ${j===jsel?'selected':''}>${esc(j)}</option>`).join('')}<option value="__lain" ${jsel==='__lain'?'selected':''}>Lainnya…</option></select></label>
+      <label class="f">Jenis<select id="exJenis"><option value="" disabled ${jsel===''?'selected':''}>Pilih jenis ujian…</option>${JENIS.map(j=>`<option ${j===jsel?'selected':''}>${esc(j)}</option>`).join('')}<option value="__lain" ${jsel==='__lain'?'selected':''}>Lainnya…</option></select></label>
       <label class="f" id="jenisLainBox" ${jsel==='__lain'?'':'hidden'}>Nama jenis ujian<input type="text" id="exJenisLain" value="${esc(preset?'':ex.jenis)}" placeholder="Misal: Remedial" autocomplete="off"></label>
       <div class="two"><label class="f">Mata pelajaran<input type="text" id="exMapel" value="${esc(ex.mapel)}" placeholder="Misal: Kimia" autocomplete="off"></label>
         <label class="f">Kelas<input type="text" id="exKelas" value="${esc(ex.kelas)}" placeholder="Misal: XI IPA" autocomplete="off"></label></div>
       <div class="f">Jumlah soal
         <div class="seg" role="group" aria-label="Jumlah soal"><button type="button" data-n="40" aria-pressed="${ex.n===40}">40 soal</button><button type="button" data-n="50" aria-pressed="${ex.n===50}">50 soal</button></div></div>
       <label class="f">Atau ketik jumlah lain (1 sampai ${NMAX})<input type="number" id="exN" inputmode="numeric" min="1" max="${NMAX}" value="${ex.n}"></label>
-      <p class="muted">Lembar jawab tetap 50 soal. Untuk 40 soal, bulatan nomor 41 sampai 50 diabaikan.</p></div></div>
+      <p class="muted">Lembar jawab tetap 50 soal. Untuk 40 soal, bulatan nomor 41 sampai 50 diabaikan.</p>
+      <div id="jMsg" aria-live="polite"></div></div></div>
    <div class="card" data-sec="kunci"><div class="kh"><h2 style="margin:0">Kunci jawaban</h2><b id="keyCount"></b></div>
       <div class="prog" id="keyProg"><i></i></div>
       <div id="keyChips"></div>
@@ -1007,12 +1024,37 @@ function renderPengaturan(){
    <div class="card" data-sec="lembar"><h2>Lembar jawab</h2>
       <p class="muted" style="margin-bottom:12px">Cetak 50 soal, tiga lembar per kertas. Aplikasi hanya membaca lembar dengan empat kotak hitam di sudut.</p>
       <div class="grid2"><a class="btn" href="lembar/LEMBAR_JAWAB_A4.pdf" target="_blank" rel="noopener">Unduh A4</a><a class="btn" href="lembar/LEMBAR_JAWAB_F4.pdf" target="_blank" rel="noopener">Unduh F4</a></div></div>
-   ${S.exams.length>1?`<button class="btn small danger" id="exDel" data-sec="jenis" type="button" style="align-self:flex-start">Hapus ujian ini beserta hasilnya</button>`:''}
-   <div class="dock"><div class="dock-in"><div class="info" id="dockInfo"></div><button class="btn primary" id="goScan" type="button">Simpan &amp; lanjut →</button></div></div>`;
-  const showSec=()=>{document.querySelectorAll('#v-pengaturan [data-sec]').forEach(el=>{el.hidden=el.dataset.sec!==pTab;});document.querySelectorAll('#pTabs button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===pTab)));};
-  document.querySelectorAll('#pTabs button').forEach(b=>b.onclick=()=>{pTab=b.dataset.t;showSec();});
+   ${!draft&&hasExam()?`<button class="btn small danger" id="exDel" data-sec="jenis" type="button" style="align-self:flex-start">Hapus ujian ini beserta hasilnya</button>`:''}
+   <div class="dock" id="dock"><div class="dock-in"><div class="info" id="dockInfo"></div><button class="btn soft" id="dkSave" type="button" aria-label="Simpan pengaturan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg>Simpan</button><button class="btn primary" id="goScan" type="button"></button></div></div>`;
+  const showSec=()=>{document.querySelectorAll('#v-pengaturan [data-sec]').forEach(el=>{el.hidden=el.dataset.sec!==pTab;});document.querySelectorAll('#pTabs button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.t===pTab)));
+    const dk=$('#dock');dk.dataset.tab=pTab;$('#dkSave').hidden=!(pTab==='jenis'&&(!!draft||validEx(ex).length>0));
+    $('#goScan').innerHTML=pTab==='jenis'?'Kunci Jawaban <span aria-hidden="true">→</span>':pTab==='kunci'?'Simpan &amp; Lanjut <span aria-hidden="true">→</span>':'Lanjut ke Pindai <span aria-hidden="true">→</span>';};
+  document.querySelectorAll('#pTabs button').forEach(b=>b.onclick=()=>{
+    if(draft&&b.dataset.t!=='jenis'){toast('Lengkapi dan simpan jenis ujian dulu');showErr(validEx(ex));return;}
+    pTab=b.dataset.t;showSec();});
+  const showErr=miss=>{
+    ['exJenis','exJenisLain','exMapel','exKelas'].forEach(id=>{const el=$('#'+id);if(el)el.removeAttribute('aria-invalid');});
+    const m=$('#jMsg');if(!m)return;
+    if(!miss.length){m.innerHTML='';return;}
+    const lain=$('#exJenis').value==='__lain';
+    if(miss.includes('jenis'))$(lain?'#exJenisLain':'#exJenis').setAttribute('aria-invalid','true');
+    if(miss.includes('mapel'))$('#exMapel').setAttribute('aria-invalid','true');
+    if(miss.includes('kelas'))$('#exKelas').setAttribute('aria-invalid','true');
+    const nm={jenis:'jenis ujian',mapel:'mata pelajaran',kelas:'kelas'};
+    m.innerHTML='<div class="note err">Data belum lengkap. Isi dulu: '+miss.map(x=>nm[x]).join(', ')+'.</div>';
+    const f=pTab==='jenis'?document.querySelector('#v-pengaturan [aria-invalid=true]'):null;if(f&&f.focus)f.focus({preventScroll:false});
+  };
+  /* simpan jenis ujian: hanya bila data lengkap; ujian baru baru masuk daftar setelah lengkap */
+  const commit=()=>{
+    const miss=validEx(ex);
+    if(miss.length){pTab='jenis';showSec();showErr(miss);toast('Lengkapi data jenis ujian dulu');return false;}
+    showErr([]);
+    if(draft){S.exams.push(draft);S.cur=draft.id;draft=null;pending=[];sessionSaved=0;save();renderTabs();renderPengaturan();return true;}
+    save();renderTabs();return true;
+  };
+  const toTop=()=>{try{window.scrollTo({top:0,behavior:'smooth'});}catch(e){window.scrollTo(0,0);}};
   showSec();
-  const dockInfo=()=>{const k=keyDone(ex),ok=k>=ex.n;$('#dockInfo').innerHTML=`${esc(ex.mapel||ex.jenis||'Ujian')} · ${ex.n} soal<small>${ok?'Kunci lengkap':'Kunci '+k+'/'+ex.n+' terisi'}</small>`;};
+  const dockInfo=()=>{if(draft){$('#dockInfo').innerHTML='Ujian baru<small>Lengkapi data untuk menyimpan</small>';return;}const k=keyDone(ex),ok=k>=ex.n;$('#dockInfo').innerHTML=`${esc(ex.mapel||ex.jenis||'Ujian')} · ${ex.n} soal<small>${ok?'Kunci lengkap':'Kunci '+k+'/'+ex.n+' terisi'}</small>`;};
   const redraw=()=>{
     const k=keyDone(ex);$('#keyCount').textContent=k+' / '+ex.n;
     const p=$('#keyProg');p.classList.toggle('full',k>=ex.n);p.firstElementChild.style.width=(ex.n?k/ex.n*100:0)+'%';
@@ -1021,9 +1063,13 @@ function renderPengaturan(){
     dockInfo();
   };
   redraw();
-  const upd=()=>{save();renderTabs();const o=$('#exSel').selectedOptions[0];if(o)o.textContent=examName(ex);dockInfo();};
-  $('#exSel').onchange=e=>{S.cur=e.target.value;save();pending=[];sessionSaved=0;renderPengaturan();renderTabs();};
-  $('#exNew').onclick=()=>{const e=newExam({});S.exams.push(e);S.cur=e.id;save();pending=[];sessionSaved=0;renderPengaturan();renderTabs();$('#exMapel').focus();};
+  const upd=()=>{if(!draft)save();renderTabs();if($('#jMsg').innerHTML)showErr(validEx(ex));showSec();const o=$('#exSel').selectedOptions[0];if(o)o.textContent=examName(ex);dockInfo();};
+  $('#exSel').onchange=e=>{if(e.target.value==='__draft')return;draft=null;S.cur=e.target.value;save();pending=[];sessionSaved=0;renderPengaturan();renderTabs();};
+  $('#exNew').onclick=()=>{
+    if(draft){pTab='jenis';showSec();$('#exJenis').focus();return;}
+    if(!commitOk())return;
+    draft=newExam({jenis:''});pTab='jenis';renderPengaturan();toTop();$('#exJenis').focus();};
+  const commitOk=()=>validEx(ex).length===0||(pTab='jenis',showSec(),showErr(validEx(ex)),toast('Lengkapi data ujian ini dulu sebelum membuat yang baru'),false);
   $('#exJenis').onchange=e=>{if(e.target.value==='__lain'){$('#jenisLainBox').hidden=false;ex.jenis=$('#exJenisLain').value||'';$('#exJenisLain').focus();}else{$('#jenisLainBox').hidden=true;ex.jenis=e.target.value;}upd();};
   $('#exJenisLain').oninput=e=>{ex.jenis=e.target.value;upd();};
   $('#exMapel').oninput=e=>{ex.mapel=e.target.value;upd();};
@@ -1040,9 +1086,12 @@ function renderPengaturan(){
   const kc=$('#keyClear');let ka=false;kc.onclick=()=>{if(!ka){ka=true;kc.textContent='Ketuk lagi untuk mengosongkan';setTimeout(()=>{ka=false;kc.textContent='Kosongkan kunci';},3000);return;}ex.key=Array(NMAX).fill('');save();redraw();};
   const dl=$('#exDel');
   if(dl){let a=false;dl.onclick=()=>{if(!a){a=true;dl.textContent='Ketuk lagi untuk menghapus';setTimeout(()=>{a=false;dl.textContent='Hapus ujian ini beserta hasilnya';},3000);return;}
-    S.exams=S.exams.filter(x=>x!==ex);S.cur=S.exams[0].id;save();pending=[];sessionSaved=0;renderPengaturan();renderTabs();};}
+    S.exams=S.exams.filter(x=>x!==ex);S.cur=S.exams[0]?S.exams[0].id:null;save();pending=[];sessionSaved=0;renderPengaturan();renderTabs();};}
   $('#keyCam').onclick=()=>openCamera(scanKeyFile,{fallbackFor:'inKey'});
-  $('#goScan').onclick=()=>{save();const k=keyDone(ex);toast(k>=ex.n?'Pengaturan tersimpan':'Pengaturan tersimpan, kunci belum lengkap');location.hash='#pindai';};
+  $('#dkSave').onclick=()=>{if(commit())toast('Jenis ujian tersimpan');};
+  $('#goScan').onclick=()=>{if(!commit())return;
+    if(pTab==='jenis'){pTab='kunci';showSec();toTop();toast('Tersimpan. Lanjut isi kunci jawaban');return;}
+    const k=keyDone(ex);toast(k>=ex.n?'Pengaturan tersimpan':'Pengaturan tersimpan, kunci belum lengkap');location.hash='#pindai';};
 }
 
 /* ====== Riwayat ====== */
@@ -1054,7 +1103,7 @@ function openExam(id,hash){S.cur=id;save();pending=[];sessionSaved=0;location.ha
 function fillRiwayatList(){
   const q=riwayatQ.trim().toLowerCase(),box=$('#rList');
   const list=[...S.exams].sort((a,b)=>lastAct(b)-lastAct(a)).filter(e=>!q||examName(e).toLowerCase().includes(q));
-  if(!list.length){box.innerHTML='<div class="card empty"><p class="muted" style="margin:0">Tidak ada ujian yang cocok.</p></div>';return;}
+  if(!list.length){box.innerHTML=S.exams.length?'<div class="card empty"><p class="muted" style="margin:0">Tidak ada ujian yang cocok.</p></div>':'<div class="card empty"><h2>Belum ada ujian</h2><p class="muted">Ujian yang Anda buat akan tercatat di sini.</p><a class="btn primary" href="#pengaturan">Buat ujian</a></div>';return;}
   box.innerHTML='';
   list.forEach(e=>{
     const gs=e.results.map(r=>grade(r.ans,e).nilai),avg=gs.length?gs.reduce((a,b)=>a+b,0)/gs.length:null,active=e.id===S.cur;
@@ -1242,7 +1291,8 @@ function init(){
   ['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault()));
   $('#inCam').onchange=e=>{const f=[...e.target.files];e.target.value='';handleFiles(f);};
   $('#inGal').onchange=e=>{const f=[...e.target.files];e.target.value='';handleFiles(f);};
-  $('#btnCam').onclick=()=>openCamera(f=>handleFiles([f]),{fallbackFor:'inCam'});
+  $('#btnCam').onclick=()=>{if(!hasExam()){toast('Buat ujian dulu di menu Pengaturan');location.hash='#pengaturan';return;}openCamera(f=>handleFiles([f]),{fallbackFor:'inCam'});};
+  document.querySelectorAll('label[for=inGal],label[for=inCam]').forEach(l=>l.addEventListener('click',e=>{if(!hasExam()){e.preventDefault();toast('Buat ujian dulu di menu Pengaturan');location.hash='#pengaturan';}}));
   $('#inKeyGal').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)scanKeyFile(f);};
   $('#inKey').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)scanKeyFile(f);};
   $('#inRestore').onchange=async e=>{
@@ -1251,17 +1301,18 @@ function init(){
     if(r.err){toast(r.err);return;}
     pending=[];sessionSaved=0;toast('Cadangan dipulihkan: '+r.ujian+' ujian, '+r.siswa+' hasil siswa');route();
   };
-  $('#btnDemo').onclick=()=>{
+  $('#btnDemo').onclick=()=>{draft=null;
     if(!exam().demo){const d=S.exams.find(x=>x.demo);if(d){S.cur=d.id;}else{const dd=newExam({mapel:'Contoh',kelas:'X',key:DEMO_KEY.split(''),demo:true});S.exams.push(dd);S.cur=dd.id;}save();pending=[];sessionSaved=0;toast('Beralih ke ujian contoh');}
     handleFiles([dataUrlToBlob(DEMO_IMG)]);
   };
   addEventListener('hashchange',route);
   route();
-  /* sampul: tampil pada kunjungan pertama; ketuk logo di header untuk membukanya lagi */
+  /* sampul: tampil sekali per hari (tanggal lokal); ketuk logo di header untuk membukanya lagi */
   (function(){
     const cv=$('#cover'),KEY='koreksi-ljk-sampul';
-    const seen=()=>{try{return localStorage.getItem(KEY)==='1';}catch(e){return false;}};
-    const mark=()=>{try{localStorage.setItem(KEY,'1');}catch(e){}};
+    const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+    const seen=()=>{try{return localStorage.getItem(KEY)===today();}catch(e){return false;}};
+    const mark=()=>{try{localStorage.setItem(KEY,today());}catch(e){}};
     let first=false;
     const open=f=>{first=f;cv.classList.remove('out');cv.hidden=false;document.body.style.overflow='hidden';if(!f)setTimeout(()=>$('#coverGo').focus({preventScroll:true}),30);};
     const close=()=>{mark();cv.classList.add('out');document.body.style.overflow='';setTimeout(()=>{cv.hidden=true;},280);if(first&&!location.hash.slice(1))location.hash='#pengaturan';else if(first)route();first=false;};
