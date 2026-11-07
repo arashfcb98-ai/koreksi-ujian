@@ -74,3 +74,8 @@ Jika tampilan lama masih muncul di HP, tutup aplikasi sepenuhnya lalu buka lagi,
 File ada di folder `lembar/` (A4 dan F4). Cetak dengan skala **100%** (jangan "fit to page").
 Sisakan tepi putih saat menggunting tiga lembar; kotak hitam di sudut tidak boleh terpotong.
 Aplikasi hanya membaca lembar yang memiliki empat kotak hitam di sudut.
+
+
+## Sampul
+
+Saat aplikasi dibuka pertama kali di sebuah HP atau browser, muncul halaman sampul berisi deskripsi singkat dan nama pembuat. Ketuk **Mulai Mengoreksi** untuk masuk ke menu Pengaturan. Sampul tidak muncul lagi di kunjungan berikutnya. Untuk melihatnya lagi, ketuk logo sekolah di bagian atas aplikasi (tombol Esc di laptop menutupnya).
